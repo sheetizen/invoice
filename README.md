@@ -4,7 +4,7 @@ Aplikasi web sederhana berbasis HTML, CSS (Tailwind CSS), dan JavaScript untuk m
 
 ## 🌐 DEMO
 
-Coba langsung aplikasinya di sini: **[INVOICE - SHEETIZEN](https://inv.sheetizen.web.id/)**
+Coba langsung aplikasinya di sini: **[inv.sheetizen.web.id](https://inv.sheetizen.web.id/)**
 
 ## ✨ Fitur Utama
 
@@ -49,7 +49,13 @@ Aplikasi ini adalah website statis murni dan dapat di-deploy dengan mudah ke ber
 3.  **Unggah/Deploy:** Ikuti petunjuk platform pilihan Anda. Biasanya cukup dengan *drag-and-drop* file `index.html` atau menghubungkan repositori Git Anda.
 4.  **Akses:** Platform akan memberikan URL publik agar aplikasi Anda bisa diakses oleh siapa saja.
 
+## 🥑 Dukung Pengembang
+
+Suka dengan aplikasi ini? 
+[Jajanin Alpukat Biar Semangat](https://saweria.co/sheetizen) 
+Semoga bermanfaat!
+
 ---
 
-*Semoga bermanfaat, Sheetizen (sheetizen.web.id)*
+_Sheetizen (sheetizen.web.id)*_
 
