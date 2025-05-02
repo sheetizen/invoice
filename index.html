@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice [SHEETIZEN]</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Optional: Tailwind Configuration
+        tailwind.config = {
+             theme: {
+                 extend: {
+                     fontFamily: {
+                         sans: ['ui-sans-serif', 'system-ui', 'sans-serif'], // Default sans-serif font stack
+                     },
+                     colors: {
+                         'invoice-red': '#E53935', // Red color for invoice number
+                         'text-main': '#000000', // Main text color (black)
+                         'text-secondary': '#4B5563', // Secondary text color (gray)
+                         'border-subtle': '#E5E7EB', // Subtle border color (web view)
+                         'border-print': '#D1D5DB', // Slightly darker border for print (gray-300)
+                         'brand-blue': { // Brand blue color variations
+                             '500': '#3B82F6',
+                             '600': '#2563EB',
+                         }
+                     }
+                 }
+             }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        /* 2. Custom styles */
+        body {
+            @apply font-sans bg-white text-text-main;
+        }
+        .input-minimal {
+            @apply border-none p-0 m-0 bg-transparent w-full align-baseline focus:outline-none focus:ring-0 focus:border-b focus:border-brand-blue-500;
+            line-height: inherit;
+            padding-bottom: 1px;
+        }
+        .textarea-minimal {
+            @apply border border-transparent p-0 m-0 bg-transparent w-full h-auto align-baseline focus:outline-none focus:ring-0 focus:border focus:border-gray-300 focus:p-1 rounded resize-none; /* Disable resize */
+            min-height: 3em; /* Increased minimum height */
+            overflow: auto; /* Still allow scroll if content overflows */
+        }
+        .input-minimal-numeric {
+            @apply input-minimal text-right;
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .btn-link {
+            @apply text-blue-600 hover:text-blue-800 text-sm cursor-pointer;
+        }
+        .btn-icon-danger {
+            @apply text-gray-400 hover:text-red-500 cursor-pointer transition-colors duration-150 ease-in-out;
+        }
+
+        /* === TABLE STYLES (Web View) === */
+        #items-table th,
+        #items-table td {
+            @apply px-2 py-2 text-sm align-top border-b border-r border-border-subtle;
+        }
+        #items-table th {
+             @apply text-left font-bold;
+        }
+        #items-table td.row-number {
+             @apply text-center text-text-secondary;
+        }
+        #items-table th:not(:first-child),
+        #items-table td:not(:first-child) {
+            @apply border-l border-border-subtle;
+        }
+        #items-table th:last-child,
+        #items-table td:last-child {
+             @apply border-r-0;
+        }
+        #items-table tr:last-child td {
+             @apply border-b-0;
+        }
+        /* === END TABLE STYLES === */
+
+        /* Styles for print media */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-container {
+                @apply shadow-none border-none p-0 m-0 max-w-full;
+            }
+            body, html {
+                @apply bg-white text-black;
+            }
+            /* Input and textarea styles for print (already includes resize-none) */
+            input, textarea {
+                @apply border-none p-0 m-0 shadow-none appearance-none bg-transparent focus:ring-0 focus:border-transparent resize-none;
+            }
+             /* === PRINT TABLE STYLES === */
+             #items-table th,
+             #items-table td {
+                 @apply border-b border-r border-border-print px-2 pt-1 pb-1;
+             }
+             #items-table th:not(:first-child),
+             #items-table td:not(:first-child) {
+                 @apply border-l border-border-print;
+             }
+             #items-table th:last-child,
+             #items-table td:last-child {
+                 @apply border-r-0;
+             }
+             #items-table tr:last-child td {
+                 @apply border-b-0;
+             }
+             /* === END PRINT TABLE STYLES === */
+
+             #company-logo.is-placeholder {
+                display: none !important;
+             }
+        }
+    </style>
+</head>
+<body class="py-8 md:py-12">
+
+    <div class="container mx-auto max-w-3xl px-6 md:px-8 print-container">
+
+        <div class="flex justify-between items-start mb-8">
+            <div>
+                <div class="mb-4">
+                    <img id="company-logo" src="https://via.placeholder.com/150x50?text=Logo+Anda" alt="Logo Perusahaan" class="h-10 mb-1 is-placeholder">
+                    <div class="no-print mt-1">
+                        <label for="logo-url-input" class="text-xs text-gray-500 block">URL Logo:</label>
+                        <input type="url" id="logo-url-input" class="input-minimal text-xs w-full text-gray-500" placeholder="Tempel URL logo di sini...">
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold mb-1">INVOICE</h1>
+                <div class="text-sm mb-0.5">
+                    No: <input type="text" id="invoice-no" class="input-minimal inline w-auto text-invoice-red font-medium" placeholder="">
+                </div>
+                <div class="text-sm text-text-secondary">
+                     <input type="text" id="invoice-date" class="input-minimal inline w-auto" placeholder="">
+                </div>
+            </div>
+            <div class="text-sm text-right">
+                <div class="font-bold mb-1">Kepada:</div>
+                <div class="mb-0.5"><input type="text" id="client-name" class="input-minimal text-right font-medium" placeholder="Nama Customer"></div>
+                <div class="mb-0.5"><input type="tel" id="client-contact" class="input-minimal text-right text-text-secondary" placeholder="62812-3456-7890"></div>
+                <div><textarea id="client-address" class="textarea-minimal text-right text-text-secondary" placeholder="Jl. Jalan Aja No. 345" rows="3"></textarea></div>
+            </div>
+        </div>
+
+        <div class="mb-10">
+            <table id="items-table" class="w-full">
+                <thead>
+                    <tr>
+                        <th class="w-10 text-center">#</th>
+                        <th>Deskripsi</th>
+                        <th class="w-28 text-right">Harga</th>
+                        <th class="w-16 text-center">Qty</th>
+                        <th class="w-28 text-right">Jumlah</th>
+                        <th class="w-10 text-center no-print"></th>
+                    </tr>
+                </thead>
+                <tbody id="invoice-items">
+                    <tr class="item-row">
+                        <td class="row-number">1.</td>
+                        <td><input type="text" class="input-minimal item-desc" placeholder="Deskripsi item..."></td>
+                        <td><input type="number" class="input-minimal-numeric item-price" placeholder="0" min="0"></td>
+                        <td class="text-center"><input type="number" class="input-minimal-numeric text-center item-qty" placeholder="1" min="1" value="1"></td>
+                        <td class="text-right"><span class="item-total font-medium">Rp 0</span></td>
+                        <td class="text-center no-print">
+                            <button type="button" class="btn-icon-danger" onclick="deleteRow(this)" title="Hapus item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 inline-block"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mb-10 no-print">
+            <button type="button" id="add-row-btn" class="btn-link">+ Tambah Item</button>
+        </div>
+
+        <div class="flex justify-between items-start border-t border-border-subtle pt-6">
+            <div class="text-sm w-1/2 pr-4">
+                <div class="font-bold mb-1">Informasi Pembayaran.</div>
+                <textarea id="payment-info" class="textarea-minimal text-text-secondary" placeholder="Bank BCA : 4321234567&#10;A/n. Nama Pemilik Rekening" rows="6"></textarea>
+            </div>
+            <div class="text-sm w-1/2 pl-4">
+                <table class="w-full"><tbody>
+                    <tr><td class="py-1 pr-2 text-text-secondary">Sub-Total.</td><td class="py-1 text-right font-medium"><span id="subtotal">Rp 0</span></td></tr>
+                    <tr><td class="py-1 pr-2 text-text-secondary">Diskon. (-)</td><td class="py-1 text-right"><input type="number" id="discount" class="input-minimal-numeric w-20" value="0" min="0"></td></tr>
+                    <tr class="font-medium"><td class="py-1 pr-2">Total.</td><td class="py-1 text-right"><span id="total">Rp 0</span></td></tr>
+                    <tr><td class="py-1 pr-2 text-text-secondary">DP.</td><td class="py-1 text-right"><input type="number" id="dp" class="input-minimal-numeric w-20" value="0" min="0"></td></tr>
+                    <tr class="font-bold text-base"><td class="py-2 pr-2">Sisa.</td><td class="py-2 text-right"><span id="balance">Rp 0</span></td></tr>
+                </tbody></table>
+            </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-border-subtle flex justify-end space-x-4 no-print">
+            <button type="button" id="print-pdf-btn" class="btn-link">Cetak / PDF</button>
+            <button type="button" id="send-wa-btn" class="btn-link">Kirim WA</button>
+        </div>
+
+        <footer class="mt-10 pt-4 border-t border-border-subtle text-center text-xs text-gray-400">
+            &copy; <span id="current-year"></span> - stz.web.id
+        </footer>
+
+    </div> <script>
+        /**
+         * Formats a number as Indonesian Rupiah (IDR).
+         * @param {number|string} angka The number to format.
+         * @returns {string} The formatted currency string (e.g., "Rp 1.234"). Returns "Rp 0" if input is invalid.
+         */
+        function formatRupiah(angka) {
+            if (isNaN(parseFloat(angka))) return 'Rp 0'; // Handle non-numeric input
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0, // No decimal places
+                maximumFractionDigits: 0
+            }).format(angka);
+        }
+
+        /**
+         * Calculates the subtotal, total, and balance based on item rows, discount, and down payment.
+         * Updates the corresponding display elements in the HTML.
+         */
+        function calculateTotals() {
+            let subtotal = 0;
+            // Iterate over each item row
+            document.querySelectorAll('#invoice-items tr.item-row').forEach(row => {
+                const priceInput = row.querySelector('.item-price');
+                const qtyInput = row.querySelector('.item-qty');
+                const totalSpan = row.querySelector('.item-total');
+
+                const price = parseFloat(priceInput.value) || 0; // Get price, default to 0 if invalid
+                const qty = parseInt(qtyInput.value) || 0; // Get quantity, default to 0 if invalid
+                const lineTotal = price * qty; // Calculate line total
+
+                totalSpan.textContent = formatRupiah(lineTotal); // Display formatted line total
+                subtotal += lineTotal; // Add to subtotal
+            });
+
+            const discountInput = document.getElementById('discount');
+            const dpInput = document.getElementById('dp');
+            const subtotalSpan = document.getElementById('subtotal');
+            const totalSpan = document.getElementById('total');
+            const balanceSpan = document.getElementById('balance');
+
+            const discount = parseFloat(discountInput.value) || 0; // Get discount, default to 0
+            const dp = parseFloat(dpInput.value) || 0; // Get down payment, default to 0
+
+            const total = subtotal - discount; // Calculate total after discount
+            const balance = total - dp; // Calculate remaining balance
+
+            // Update display elements
+            subtotalSpan.textContent = formatRupiah(subtotal);
+            totalSpan.textContent = formatRupiah(total);
+            balanceSpan.textContent = formatRupiah(balance);
+        }
+
+        /**
+         * Adds a new empty item row to the invoice table.
+         */
+        function addRow() {
+            const tableBody = document.getElementById('invoice-items');
+            const newRow = document.createElement('tr');
+            newRow.classList.add('item-row');
+            const rowCount = tableBody.querySelectorAll('tr.item-row').length + 1; // Determine new row number
+
+            // HTML structure for the new row
+            newRow.innerHTML = `
+                <td class="row-number">${rowCount}.</td>
+                <td><input type="text" class="input-minimal item-desc" placeholder="Deskripsi item..."></td>
+                <td><input type="number" class="input-minimal-numeric item-price" placeholder="0" min="0"></td>
+                <td class="text-center"><input type="number" class="input-minimal-numeric text-center item-qty" placeholder="1" min="1" value="1"></td>
+                <td class="text-right"><span class="item-total font-medium">Rp 0</span></td>
+                <td class="text-center no-print">
+                    <button type="button" class="btn-icon-danger" onclick="deleteRow(this)" title="Hapus item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 inline-block"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(newRow); // Add the new row to the table
+            addEventListenersToRow(newRow); // Attach event listeners to the new row's inputs
+            renumberRows(); // Update row numbers
+            newRow.querySelector('.item-desc').focus(); // Focus on the new description field
+            calculateTotals(); // Recalculate totals
+        }
+
+        /**
+         * Deletes an item row from the table. If it's the last row, clears its inputs instead of deleting.
+         * @param {HTMLButtonElement} button The delete button that was clicked.
+         */
+        function deleteRow(button) {
+            const tableBody = document.getElementById('invoice-items');
+            const row = button.closest('tr.item-row'); // Find the parent row
+
+            if (!row) return; // Exit if row not found
+
+            // If more than one row exists, remove the row
+            if (tableBody.querySelectorAll('tr.item-row').length > 1) {
+                row.remove();
+                renumberRows(); // Update row numbers after deletion
+                calculateTotals(); // Recalculate totals
+            } else {
+                // If it's the last row, clear the inputs instead of removing
+                const descInput = row.querySelector('.item-desc');
+                const priceInput = row.querySelector('.item-price');
+                const qtyInput = row.querySelector('.item-qty');
+                if (descInput) descInput.value = '';
+                if (priceInput) priceInput.value = '0';
+                if (qtyInput) qtyInput.value = '1';
+                calculateTotals(); // Recalculate totals after clearing
+            }
+        }
+
+        /**
+         * Updates the row numbers in the first column of the table.
+         */
+        function renumberRows() {
+            document.querySelectorAll('#invoice-items tr.item-row').forEach((row, index) => {
+                const rowNumCell = row.querySelector('.row-number');
+                if (rowNumCell) rowNumCell.textContent = `${index + 1}.`; // Set text content like "1.", "2.", etc.
+            });
+        }
+
+        /**
+         * Adds necessary event listeners to the input fields within a given table row.
+         * @param {HTMLTableRowElement} row The table row element containing the inputs.
+         */
+        function addEventListenersToRow(row) {
+            // Add listeners to price and quantity inputs to recalculate totals on change
+            row.querySelectorAll('.item-price, .item-qty').forEach(input => {
+                input.removeEventListener('input', calculateTotals);
+                input.addEventListener('input', calculateTotals);
+            });
+
+            // Add listeners for auto-resizing text inputs and textareas
+            row.querySelectorAll('.input-minimal, .textarea-minimal').forEach(input => {
+                const listener = () => {
+                    // Auto-adjust height for textareas and text inputs
+                    input.style.height = 'auto'; // Reset height first
+                    input.style.height = input.scrollHeight + 'px'; // Set to scroll height
+                };
+                if (input.listenerAttached) {
+                    input.removeEventListener('input', input.listenerAttached);
+                }
+                input.addEventListener('input', listener);
+                input.listenerAttached = listener;
+                // Trigger initial resize check
+                setTimeout(() => listener(), 0);
+            });
+        }
+
+        /**
+         * Triggers the browser's print dialog.
+         */
+        function printInvoice() {
+            window.print();
+        }
+
+        /**
+         * Generates a WhatsApp message link with the invoice details.
+         */
+        function sendWhatsApp() {
+            const clientName = document.getElementById('client-name').value.trim() || 'Pelanggan';
+            const clientContact = document.getElementById('client-contact').value.trim();
+            const invoiceNo = document.getElementById('invoice-no').value.trim() || 'INV-XXXX';
+            const invoiceDate = document.getElementById('invoice-date').value.trim();
+            const paymentInfo = document.getElementById('payment-info').value.trim();
+
+            let itemsText = "";
+            let subtotal = 0;
+
+            const rows = document.querySelectorAll('#invoice-items tr.item-row');
+            rows.forEach((row, index) => {
+                const desc = row.querySelector('.item-desc').value.trim() || 'Item';
+                const qty = parseInt(row.querySelector('.item-qty').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                const lineTotal = qty * price;
+                subtotal += lineTotal;
+                itemsText += `${index + 1}. ${qty}x ${desc} @ ${formatRupiah(price)} = *${formatRupiah(lineTotal)}*\n`;
+            });
+            itemsText = itemsText.trim();
+
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const dp = parseFloat(document.getElementById('dp').value) || 0;
+            const total = subtotal - discount;
+            const balance = total - dp;
+
+            let message = `Dear Bapak/Ibu *${clientName}*,\n\nBerikut detail tagihan untuk:\n*Invoice: ${invoiceNo}*\nTanggal Order: *${invoiceDate}*\n\n*DETAIL ITEM:*\n${itemsText}\n--------------------\nSub-Total: ${formatRupiah(subtotal)}\n`;
+            if (discount > 0) {
+                message += `Diskon: - ${formatRupiah(discount)}\n`;
+            }
+            message += `*Total: ${formatRupiah(total)}*\n`;
+            if (dp > 0) {
+                message += `DP/Dibayar: ${formatRupiah(dp)}\n*Sisa Tagihan: ${formatRupiah(balance)}*\n`;
+            }
+            message += `--------------------\n\n`;
+            if (paymentInfo) {
+                message += `*Info Pembayaran:*\n${paymentInfo}\n\n`;
+            }
+            message += `Terima kasih.\n\n> _Made via stz.web.id_`;
+
+            const encodedMessage = encodeURIComponent(message);
+            let waUrl;
+            const cleanContact = clientContact ? clientContact.replace(/[\s-()+]/g, '') : '';
+
+            if (cleanContact && /^\d+$/.test(cleanContact) && cleanContact.startsWith('62') && cleanContact.length >= 10) {
+                waUrl = `https://wa.me/${cleanContact}?text=${encodedMessage}`;
+            } else {
+                waUrl = `https://wa.me/?text=${encodedMessage}`;
+                if (clientContact) {
+                    console.warn("Format nomor kontak mungkin salah. Menggunakan link WA generik.");
+                } else {
+                     console.warn("Nomor kontak kosong. Menggunakan link WA generik.")
+                }
+            }
+            console.log("Pesan WA Length:", message.length);
+            console.log("WA URL:", waUrl);
+            window.open(waUrl, '_blank');
+        }
+
+        // === Initialization code runs after the DOM is fully loaded ===
+        document.addEventListener('DOMContentLoaded', function() {
+            const defaultTitle = "Invoice - [SHEETIZEN]"; // Judul default
+
+            // --- Set Date and Invoice Number ---
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const dateStringForInv = `${year}${month}${day}`;
+
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = today.toLocaleDateString('id-ID', options);
+            document.getElementById('invoice-date').value = formattedDate;
+
+            const sequence = '001';
+            const generatedInvNo = `INV-${dateStringForInv}-${sequence}`;
+            document.getElementById('invoice-no').value = generatedInvNo;
+
+            document.getElementById('current-year').textContent = year;
+
+            // --- Logo Handling ---
+            const logoUrlInput = document.getElementById('logo-url-input');
+            const companyLogo = document.getElementById('company-logo');
+            const defaultLogoSrc = 'https://via.placeholder.com/150x50?text=Logo+Anda';
+
+            function updateLogo(url) {
+                const newSrc = url.trim();
+                if (newSrc !== '' && newSrc !== defaultLogoSrc) {
+                    companyLogo.src = newSrc;
+                    companyLogo.classList.remove('is-placeholder');
+                } else {
+                    companyLogo.src = defaultLogoSrc;
+                    companyLogo.classList.add('is-placeholder');
+                }
+            }
+
+            logoUrlInput.addEventListener('input', function(event) {
+                updateLogo(event.target.value);
+            });
+
+            companyLogo.onerror = function() {
+                console.error('Gagal memuat logo dari URL:', companyLogo.src);
+                companyLogo.src = defaultLogoSrc;
+                companyLogo.classList.add('is-placeholder');
+                logoUrlInput.value = '';
+            };
+
+            // --- Attach Event Listeners ---
+            document.querySelectorAll('#items-table .item-row').forEach(row => {
+                addEventListenersToRow(row);
+            });
+            document.getElementById('discount').addEventListener('input', calculateTotals);
+            document.getElementById('dp').addEventListener('input', calculateTotals);
+            document.getElementById('add-row-btn').addEventListener('click', addRow);
+            document.getElementById('print-pdf-btn').addEventListener('click', printInvoice);
+            document.getElementById('send-wa-btn').addEventListener('click', sendWhatsApp);
+
+            // --- PERUBAHAN: Event listener untuk update judul tab ---
+            const clientNameInput = document.getElementById('client-name');
+            clientNameInput.addEventListener('input', function() {
+                const clientName = clientNameInput.value.trim();
+                if (clientName) {
+                    document.title = `Invoice ${clientName} - [SHEETIZEN]`;
+                } else {
+                    document.title = defaultTitle; // Kembali ke judul default jika nama kosong
+                }
+            });
+            // --- Akhir Perubahan ---
+
+            // --- Initial Calculations and Setup ---
+            calculateTotals();
+            renumberRows();
+            document.querySelectorAll('.textarea-minimal').forEach(textarea => {
+                 if (textarea.listenerAttached) {
+                     textarea.listenerAttached();
+                 } else {
+                     setTimeout(() => {
+                         textarea.style.height = 'auto';
+                         textarea.style.height = textarea.scrollHeight + 'px';
+                     }, 0);
+                 }
+            });
+             updateLogo(logoUrlInput.value);
+             // Set initial title based on current client name (if any)
+             const initialClientName = clientNameInput.value.trim();
+             if (initialClientName) {
+                 document.title = `Invoice ${initialClientName} - [SHEETIZEN]`;
+             } else {
+                 document.title = defaultTitle;
+             }
+        });
+    </script>
+
+</body>
+</html>
