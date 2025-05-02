@@ -8,15 +8,15 @@ Coba langsung aplikasinya di sini: **[INVOICE - SHEETIZEN](https://inv.sheetizen
 
 ## ✨ Fitur Utama
 
-* ✏️ **Edit Langsung:** Ubah detail invoice (nomor, tanggal, nama klien, alamat, kontak) langsung di halaman.
-* ➕➖ **Manajemen Item:** Tambah, hapus, dan edit item invoice (deskripsi, harga, kuantitas).
-* ⚙️ **Perhitungan Otomatis:** Subtotal, diskon, total, DP, dan sisa tagihan dihitung secara otomatis.
-* 🖼️ **Input Logo:** Masukkan URL logo perusahaan Anda untuk ditampilkan di invoice.
-* 💳 **Informasi Pembayaran:** Tambahkan detail rekening bank atau metode pembayaran lainnya.
-* 📄 **Cetak / Simpan PDF:** Hasilkan tampilan siap cetak atau simpan sebagai PDF melalui fungsi print browser.
-* 📱 **Kirim via WhatsApp:** Buat pesan WhatsApp otomatis berisi ringkasan invoice untuk dikirim ke klien.
-* ✨ **Judul Tab Dinamis:** Judul tab browser otomatis berubah sesuai nama klien yang dimasukkan.
-* 💻 **Desain Responsif:** Tampilan menyesuaikan dengan berbagai ukuran layar.
+* **Edit Langsung:** Ubah detail invoice (nomor, tanggal, nama klien, alamat, kontak) langsung di halaman.
+* **Manajemen Item:** Tambah, hapus, dan edit item invoice (deskripsi, harga, kuantitas).
+* **Perhitungan Otomatis:** Subtotal, diskon, total, DP, dan sisa tagihan dihitung secara otomatis.
+* **Input Logo:** Masukkan URL logo perusahaan Anda untuk ditampilkan di invoice.
+* **Informasi Pembayaran:** Tambahkan detail rekening bank atau metode pembayaran lainnya.
+* **Cetak / Simpan PDF:** Hasilkan tampilan siap cetak atau simpan sebagai PDF melalui fungsi print browser.
+* **Kirim via WhatsApp:** Buat pesan WhatsApp otomatis berisi ringkasan invoice untuk dikirim ke klien.
+* **Judul Tab Dinamis:** Judul tab browser otomatis berubah sesuai nama klien yang dimasukkan.
+* **Desain Responsif:** Tampilan menyesuaikan dengan berbagai ukuran layar.
 
 ## 🖥️ Cara Menggunakan (Lokal - PC/Laptop)
 
@@ -51,5 +51,5 @@ Aplikasi ini adalah website statis murni dan dapat di-deploy dengan mudah ke ber
 
 ---
 
-*Semoga bermanfaat, Sheetizen (stz.web.id)*
+*Semoga bermanfaat, Sheetizen (sheetizen.web.id)*
 
