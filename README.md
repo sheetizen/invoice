@@ -52,10 +52,12 @@ Aplikasi ini adalah website statis murni dan dapat di-deploy dengan mudah ke ber
 ## 🥑 Dukung Pengembang
 
 Suka dengan aplikasi ini? 
+
 [Jajanin Alpukat Biar Semangat](https://saweria.co/sheetizen) 
+
 Semoga bermanfaat!
 
 ---
 
-_Sheetizen (sheetizen.web.id)*_
+_*Sheetizen (sheetizen.web.id)*_
 
